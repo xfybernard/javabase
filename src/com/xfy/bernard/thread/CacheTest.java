@@ -1,7 +1,6 @@
 package com.xfy.bernard.thread;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 
@@ -15,12 +14,24 @@ public class CacheTest {
 
 	public static void main(String[] args) throws InterruptedException {
 		DelayQueue<Cache<User>> queue = new DelayQueue<>();
-		Cache<User> u1 = new Cache<>("1", "Bernard", new User("Bernard"), 3000l);
-		Cache<User> u2 = new Cache<>("2", "Yjwxfpl", new User("Yjwxfpl"), 10000l);
-		List<Cache<User>> list = new ArrayList<>();
-		list.add(u1);
-		list.add(u2);
-		CachePut<Delayed> putThread = new CachePut(queue, list.toArray(new Cache[0]));
+		
+		CachePut<Delayed> putThread = new CachePut(queue);
+		
+		Thread t = new Thread(){
+			@Override
+			public void run() {
+				Random rdm = new Random();
+				for(int i=0;i<20;i++){
+					String idx = String.valueOf(i);
+					String userName = "User"+idx;
+					Cache<User> data = new Cache<>(idx, userName, new User(userName), new Long(rdm.nextInt(5000000)));
+					putThread.addData(data);
+				}
+			}
+		};
+		t.start();
+		t.join();
+		
 		CacheGet<Delayed> getThread = new CacheGet(queue);
 		new Thread(putThread).start();
 		new Thread(getThread).start();

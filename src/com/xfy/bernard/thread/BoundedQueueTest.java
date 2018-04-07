@@ -1,20 +1,25 @@
 package com.xfy.bernard.thread;
 
+import java.util.Random;
+import java.util.UUID;
+
 public class BoundedQueueTest {
 
-	private static BoundedQueue<String> queue = new BoundedQueue<>(100);
+//	private static BoundedQueue<String> queue = new BoundedQueue<>(100);
+	private static BoundedQueueLC<String> queue = new BoundedQueueLC<>(5);
 
+	private static Random rdm = new Random();
+	
 	static class PushThread extends Thread {
 
 		@Override
 		public void run() {
 			try {
 				while (true) {
-					Thread.sleep(300);
-					for (int i = 0; i < 100; i++) {
-						String value = String.valueOf(System.currentTimeMillis() + i);
-						queue.push(value);
-					}
+					Thread.sleep(rdm.nextInt(50));
+					String uuid = UUID.randomUUID().toString(); 
+					queue.push(uuid);
+					System.out.println("线程" + getName() + ",put数据:" + uuid);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -28,8 +33,8 @@ public class BoundedQueueTest {
 		public void run() {
 			try {
 				while (true) {
-					System.out.println(getName() + "\t,poll数据:" + queue.poll());
-					Thread.sleep(2000);
+					System.out.println("线程" + getName() + ",poll数据:" + queue.poll());
+					Thread.sleep(rdm.nextInt(5000));
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -40,7 +45,7 @@ public class BoundedQueueTest {
 
 	public static void main(String[] args) {
 		new PushThread().start();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 			new PollThread().start();
 		}
 	}

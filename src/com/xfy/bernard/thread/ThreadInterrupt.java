@@ -5,13 +5,13 @@ import java.util.Random;
 public class ThreadInterrupt {
 
 	public static void main(String[] args) throws InterruptedException {
-		CThread thread = new ThreadInterrupt().new CThread();
+		CThread thread = new CThread();
 		thread.start();
 		Thread.sleep(new Random().nextInt(5) * 1000);
 		thread.cancel();
 	}
 
-	class CThread extends Thread {
+	static class CThread extends Thread {
 
 		private volatile boolean on = true;
 
